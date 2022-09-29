@@ -8,10 +8,7 @@ export const timelineRouter = createProtectedRouter()
     }),
     async resolve({ input, ctx }) {
       await ctx.prisma.timeline.create({
-        data: {
-          name: input.name,
-          userId: ctx.session.user.id,
-        },
+        data: { name: input.name, userId: ctx.session.user.id },
       });
     },
   })
@@ -19,6 +16,14 @@ export const timelineRouter = createProtectedRouter()
     async resolve({ ctx }) {
       return await ctx.prisma.timeline.findMany({
         where: { userId: ctx.session.user.id },
+      });
+    },
+  })
+  .query("get", {
+    input: z.object({ name: z.string() }),
+    async resolve({ input, ctx }) {
+      return await ctx.prisma.timeline.findFirst({
+        where: { name: input.name, userId: ctx.session.user.id },
       });
     },
   });
